@@ -1,15 +1,22 @@
 {
   "expo": {
-    "name": "native",
-    "slug": "native",
-    "version": "1.0.0",
+    "name": "Aster",
+    "slug": "aster-support",
+    "version": "0.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
+    "scheme": "aster",
+    "platforms": ["ios", "android"],
+    "experiments": {
+      "typedRoutes": true
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.celcomdigi.aster"
     },
     "android": {
+      "package": "com.celcomdigi.aster",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -18,8 +25,9 @@
       },
       "predictiveBackGestureEnabled": false
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    }
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ]
   }
 }
