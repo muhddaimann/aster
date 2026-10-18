@@ -1,8 +1,10 @@
 import { Inter_400Regular, Inter_600SemiBold, useFonts } from '@expo-google-fonts/inter';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { ThemeProvider } from '../src/contexts/themeContext';
+import { useTheme } from '../src/hooks/useTheme';
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
@@ -12,7 +14,7 @@ export default function RootLayout() {
 
   if (!fontsLoaded && !fontError) {
     return (
-      <View style={styles.loadingScreen}>
+      <View style={{ alignItems: 'center', backgroundColor: '#071A33', flex: 1, justifyContent: 'center' }}>
         <ActivityIndicator color="#22D3EE" />
       </View>
     );
@@ -20,23 +22,20 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={styles.safeArea}>
-        <StatusBar style="light" />
-        <Stack screenOptions={{ headerShown: false }} />
-      </SafeAreaView>
+      <ThemeProvider>
+        <RootShell />
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }
 
-const styles = StyleSheet.create({
-  loadingScreen: {
-    alignItems: 'center',
-    backgroundColor: '#071A33',
-    flex: 1,
-    justifyContent: 'center',
-  },
-  safeArea: {
-    backgroundColor: '#071A33',
-    flex: 1,
-  },
-});
+function RootShell() {
+  const { mode, theme } = useTheme();
+
+  return (
+    <SafeAreaView edges={['top']} style={{ backgroundColor: theme.colors.background, flex: 1 }}>
+      <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
+      <Stack screenOptions={{ headerShown: false }} />
+    </SafeAreaView>
+  );
+}

@@ -428,3 +428,12 @@ Do not make changes.
 - Safe-area ownership: root `SafeAreaProvider` and root `SafeAreaView` belong in `app/_layout.tsx`.
 - Foundation dependencies: Expo Router, Expo Constants, Expo Linking, Expo Font, Inter font package, vector icons, and React Native Safe Area Context.
 - Baseline validation: `npx tsc --noEmit`, `npx expo config --type public --json`, iOS/Android Expo exports, and `git diff --check` for active-phase changes.
+
+### Phase 2 — Theme Module
+
+- Theme: typed semantic light/dark tokens for colors, spacing, radii, opacity, typography, Inter font families, and shadow/elevation.
+- Behavior: initial mode follows the device scheme; manual selection is session-only and is not persisted.
+- Root shell: `SafeAreaProvider`, `ThemeProvider`, and one themed top-edge-only root `SafeAreaView`; routes do not add safe areas by default.
+- Status bar: follows the resolved theme for readable system icons.
+- Theme control: reusable 48-point icon-only switch using `@expo/vector-icons`, accessible labels/state, and native-driver press-scale feedback.
+- Themed UI uses token-driven inline styles; the landing route remains a scrollable visual reference for active tokens.
