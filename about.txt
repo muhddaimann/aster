@@ -97,3 +97,37 @@ the idea is when on scroll, showback and rightSlot stays the same place but
 title subtitle scrolled as before
 do not move title subtitle from current top row
 advice
+
+Notification Module
+based on app about, design direction
+the idea is customer would need page to get notified about the ticket, telco updates etc
+add another pressable on HomeScreen rightSlot just for notification/index
+constant to keep types, dummy data etc
+contexts to keep flow, read, update, acknowledge etc
+hooks to use it globally
+app/
+├─ (tabs)/
+│  ├─ home/
+│  │  ├─ notification/
+│  │  │  └─ index.tsx
+│  │  ├─ _layout.tsx
+│  │  └─ index.tsx
+│  └─ _layout.tsx
+├─ _layout.tsx
+└─ index.tsx
+src/
+├── components/
+│   └── notification/
+├── constants/
+│   └── notification.ts
+├── contexts/
+│   └── notificationContext.ts
+└── hooks/
+    └── useNotification.ts
+advice
+
+based on app design direction,
+HomeScreen need total redesign too
+profile widget no need to route to ProfileScreen since rightSlot have
+advice what to include to the front page of Customer Support and Ticketing platform for CelcomDigi Telco customers
+advice

@@ -1,10 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Pressable, Text, TextInput, View } from 'react-native';
 import { TicketCategoryPicker } from '../../../../src/components/ticket/ticketCategoryPicker';
 import { AppScreen } from '../../../../src/components/shared/appScreen';
-import { initialTicketDraft, type TicketDraft, type TicketValidationErrors } from '../../../../src/constants/ticket';
+import { initialTicketDraft, ticketCategories, type TicketCategory, type TicketDraft, type TicketValidationErrors } from '../../../../src/constants/ticket';
 import { profileLabels } from '../../../../src/constants/profile';
 import { useOverlay } from '../../../../src/hooks/useOverlay';
 import { useProfile } from '../../../../src/hooks/useProfile';
@@ -14,10 +14,12 @@ import { useTicket } from '../../../../src/hooks/useTicket';
 export default function CreateTicketScreen() {
   const { theme } = useTheme();
   const router = useRouter();
+  const { category: categoryParameter } = useLocalSearchParams<{ category?: string }>();
   const overlay = useOverlay();
   const { profile } = useProfile();
   const { createTicket } = useTicket();
-  const [draft, setDraft] = useState<TicketDraft>(initialTicketDraft);
+  const initialCategory = isTicketCategory(categoryParameter) ? categoryParameter : null;
+  const [draft, setDraft] = useState<TicketDraft>({ ...initialTicketDraft, category: initialCategory });
   const [errors, setErrors] = useState<TicketValidationErrors>({});
   const canSubmit = Boolean(draft.category && draft.description.trim());
 
@@ -107,6 +109,10 @@ export default function CreateTicketScreen() {
       </View>
     </AppScreen>
   );
+}
+
+function isTicketCategory(value: string | undefined): value is TicketCategory {
+  return Boolean(value && Object.values(ticketCategories).includes(value as TicketCategory));
 }
 
 function TicketTextField({ error, label, multiline, onChangeText, placeholder, theme, value }: { error?: string; label: string; multiline?: boolean; onChangeText: (value: string) => void; placeholder: string; theme: ReturnType<typeof useTheme>['theme']; value: string }) {
