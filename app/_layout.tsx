@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { OverlayProvider } from '../src/contexts/overlayProvider';
+import { BarProvider } from '../src/contexts/barContext';
 import { ThemeProvider } from '../src/contexts/themeContext';
 import { useOverlay } from '../src/hooks/useOverlay';
 import { useTheme } from '../src/hooks/useTheme';
@@ -26,7 +27,9 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <ThemeProvider>
         <OverlayProvider>
-          <RootShell />
+          <BarProvider>
+            <RootShell />
+          </BarProvider>
         </OverlayProvider>
       </ThemeProvider>
     </SafeAreaProvider>

@@ -457,3 +457,12 @@ Do not make changes.
 - Landing flow: LandingScreen replaces to Home; Home replaces back to LandingScreen.
 - Dependencies/configuration: no Phase 4 dependencies or Expo configuration were added.
 - Validation: `npx tsc --noEmit`, iOS/Android Expo exports, and `git diff --check`; manually verify tab selection/no-op behavior, nested-route bar visibility, safe-area placement, disabled route transitions, and LandingScreen/Home navigation on iOS and Android.
+
+### Phase 5 — Shared Module
+
+- Shared foundations: `AppScreen` owns scroll layout, focused scroll-controller registration, optional refresh handling, component presence motion, and a token-driven inline header with optional icon-only back control, subtitle/title block, and right slot. `EmptyState`, `LongList`, and `OptionPicker` are reusable shared primitives.
+- Picker behavior: Home presents action choices in the typed custom modal and uses `dismiss(onComplete?)` before follow-up navigation. Settings presents a preference picker in the typed bottom sheet; preferences are session-only and selection uses plain dismissal after state update. `OptionPicker` uses button semantics for actions and radio semantics for preferences.
+- Navigation: nested demo routes use deterministic replacement returns to their root routes (`/home` or `/settings`) rather than history-dependent `router.back()` behavior, including entry from Home’s replacement-based action-picker flow.
+- Floating controls: `BarProvider` owns active focused-screen scroll control. Root Home and Settings display the floating tab pill at rest, then fade to a centered 56-point scroll-to-top action after direction hysteresis. Nested routes never show the tab pill but may show the scroll-to-top action. Both controls share one bottom-inset-aware stage and noninteractive fading controls.
+- Dependencies/configuration: no Phase 5 dependencies or Expo configuration were added.
+- Validation: `npx tsc --noEmit`, iOS/Android Expo exports, and `git diff --check`; manually verify picker dismissal/navigation sequencing, deterministic nested returns, scroll ownership, floating-control handoff, narrow/large-text headers, and iOS/Android safe-bottom placement. Android runtime verification remains dependent on an available emulator or physical device.
