@@ -3,7 +3,9 @@ review this expo blank template
 
 Auth Module
 based on app about, design direction
-turn LandingScreen as login screen, user fill phone number, otp (dummy)
+total redesign LandingScreen as login screen
+button of login with celcomdigi number/ login with random number
+if ceclcomdigi, otp phase else useOverlay toast as non supported number
 constant to keep credential types etv
 contexts to keep login flow, logout, existing session async secure store keep 1 day etc
 hooks to use it globally

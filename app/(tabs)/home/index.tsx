@@ -7,16 +7,44 @@ import { LongList } from '../../../src/components/shared/longList';
 import { OptionPicker } from '../../../src/components/shared/optionPicker';
 import { BottomBar } from '../../../src/components/tabs/bottomBar';
 import { useOverlay } from '../../../src/hooks/useOverlay';
+import { useAuth } from '../../../src/hooks/useAuth';
 import { useTheme } from '../../../src/hooks/useTheme';
 
 export default function HomeScreen() {
   const { theme } = useTheme();
-  const { customModal, dismiss } = useOverlay();
+  const overlay = useOverlay();
+  const { logout } = useAuth();
   const router = useRouter();
 
+  const confirmLogout = () => {
+    overlay.destructiveConfirm({
+      cancelLabel: 'Stay signed in',
+      confirmLabel: 'Log out',
+      message: 'This removes the local demo session from this device.',
+      onConfirm: async () => {
+        const deleted = await logout();
+        if (!deleted) {
+          overlay.toast({ message: 'Aster could not remove the stored session completely.', tone: 'warning' });
+        }
+        router.replace('/');
+      },
+      title: 'Log out of Aster?',
+    });
+  };
+
   const openActionPicker = () => {
-    customModal({
-      content: <OptionPicker mode="action" onSelect={(value) => dismiss(() => { if (value === 'demo') router.replace('/home/demo'); })} options={[{ description: 'Open the full-screen Home placeholder.', label: 'Open Home demo', value: 'demo' }, { description: 'Stay in the current workspace.', label: 'Keep exploring Home', value: 'stay' }]} title="Home actions" />,
+    overlay.customModal({
+      content: <OptionPicker mode="action" onSelect={(value) => overlay.dismiss(() => {
+        if (value === 'homeDemo') {
+          router.replace('/home/demo');
+          return;
+        }
+        if (value === 'settingsDemo') {
+          router.replace('/settings/demo');
+          return;
+        }
+        confirmLogout();
+      })} options={[{ description: 'Open the full-screen Home placeholder.', label: 'Home Demo', value: 'homeDemo' }, { description: 'Open the full-screen Settings placeholder.', label: 'Settings Demo', value: 'settingsDemo' }, { description: 'Remove the local demo session from this device.', label: 'Log out', value: 'logout' }]} title="Home actions" />,
     });
   };
 
@@ -30,7 +58,6 @@ export default function HomeScreen() {
         </View>
         <EmptyState actionLabel="Open Home demo" description="The nested demo route hides the tab pill and can reveal only the scroll-to-top action." icon="folder-open-outline" onAction={() => router.push('/home/demo')} title="No active cases yet" />
         <LongList />
-        <Pressable accessibilityRole="button" onPress={() => router.replace('/')} style={({ pressed }) => ({ alignItems: 'center', backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderRadius: theme.radius.md, borderWidth: 1, justifyContent: 'center', minHeight: 48, opacity: pressed ? theme.opacity.pressed : 1, paddingHorizontal: theme.spacing.lg })}><Text style={{ color: theme.colors.textPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.label.fontSize }}>Back to landing screen</Text></Pressable>
       </AppScreen>
       <BottomBar activeTab="home" onTabPress={(tab) => { if (tab !== 'home') router.replace('/settings'); }} />
     </View>

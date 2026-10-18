@@ -5,6 +5,7 @@ import { ActivityIndicator, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { OverlayProvider } from '../src/contexts/overlayProvider';
 import { BarProvider } from '../src/contexts/barContext';
+import { AuthProvider } from '../src/contexts/authContext';
 import { ThemeProvider } from '../src/contexts/themeContext';
 import { useOverlay } from '../src/hooks/useOverlay';
 import { useTheme } from '../src/hooks/useTheme';
@@ -27,9 +28,11 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <ThemeProvider>
         <OverlayProvider>
-          <BarProvider>
-            <RootShell />
-          </BarProvider>
+          <AuthProvider>
+            <BarProvider>
+              <RootShell />
+            </BarProvider>
+          </AuthProvider>
         </OverlayProvider>
       </ThemeProvider>
     </SafeAreaProvider>

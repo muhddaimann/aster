@@ -1,205 +1,99 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
-import type { ReactNode } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { ThemeToggle } from '../src/components/theme/themeToggle';
 import { appAbout } from '../src/constants/about';
-import type { Theme } from '../src/constants/theme';
+import { authConstants, authCopy, isSupportedDemoCelcomDigiNumber, normalizeMalaysianPhoneNumber } from '../src/constants/auth';
+import { useAuth } from '../src/hooks/useAuth';
 import { useOverlay } from '../src/hooks/useOverlay';
 import { useTheme } from '../src/hooks/useTheme';
 
 export default function LandingScreen() {
-  const { mode, theme } = useTheme();
-  const overlay = useOverlay();
+  const { completeCelcomDigiDemoOtp, status } = useAuth();
+  const { toast } = useOverlay();
+  const { theme } = useTheme();
   const router = useRouter();
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [authStep, setAuthStep] = useState<'phoneEntry' | 'otpDemoConfirmation'>('phoneEntry');
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      router.replace('/home');
+    }
+  }, [router, status]);
+
+  const showStorageFailure = () => toast({ message: 'Aster could not create a local demo session. Please try again.', tone: 'danger' });
+
+  const continueWithCelcomDigiNumber = () => {
+    if (!isSupportedDemoCelcomDigiNumber(phoneNumber)) {
+      toast({ message: authCopy.unsupportedNumberMessage, tone: 'warning' });
+      return;
+    }
+
+    setAuthStep('otpDemoConfirmation');
+  };
+
+  const proceedWithCelcomDigiDemo = async () => {
+    setIsSubmitting(true);
+    const created = await completeCelcomDigiDemoOtp();
+    setIsSubmitting(false);
+    if (!created) {
+      showStorageFailure();
+      return;
+    }
+
+    router.replace('/home');
+  };
+
+  const showRandomDemoUnavailable = () => toast({ message: 'Random demo numbers are not available in this build. Use the supported CelcomDigi demo number instead.', tone: 'info' });
+
+  if (status === 'hydrating') {
+    return <View accessibilityLabel="Restoring local session" accessibilityRole="progressbar" style={{ alignItems: 'center', backgroundColor: theme.colors.background, flex: 1, gap: theme.spacing.md, justifyContent: 'center', padding: theme.spacing.xl }}><ActivityIndicator color={theme.colors.accent} /><Text style={{ color: theme.colors.textSecondary, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.label.fontSize }}>Preparing your support workspace…</Text></View>;
+  }
 
   return (
-    <ScrollView
-      contentContainerStyle={{ gap: theme.spacing.xxl, padding: theme.spacing.xl, paddingBottom: theme.spacing.xxl }}
-      style={{ backgroundColor: theme.colors.background, flex: 1 }}
-    >
-      <View style={{ alignItems: 'flex-start', flexDirection: 'row', justifyContent: 'space-between' }}>
-        <View style={{ flex: 1, paddingRight: theme.spacing.lg }}>
-          <View
-            accessible
-            accessibilityLabel="Aster support ticket icon"
-            style={{
-              alignItems: 'center',
-              backgroundColor: theme.colors.surfaceRaised,
-              borderColor: theme.colors.border,
-              borderRadius: theme.radius.lg,
-              borderWidth: 1,
-              height: 72,
-              justifyContent: 'center',
-              marginBottom: theme.spacing.lg,
-              width: 72,
-            }}
-          >
-            <Ionicons color={theme.colors.accent} name="ticket-outline" size={36} />
-          </View>
-          <Text style={{ color: theme.colors.accent, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.eyebrow.fontSize, letterSpacing: theme.typography.eyebrow.letterSpacing, lineHeight: theme.typography.eyebrow.lineHeight }}>
-            CELCOMDIGI SUPPORT
-          </Text>
-          <Text style={{ color: theme.colors.textPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.title.fontSize, letterSpacing: theme.typography.title.letterSpacing, lineHeight: theme.typography.title.lineHeight, marginTop: theme.spacing.sm }}>
-            {appAbout.name}
-          </Text>
+    <KeyboardAvoidingView behavior={Platform.select({ android: undefined, ios: 'padding' })} style={{ backgroundColor: theme.colors.background, flex: 1 }}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1, gap: theme.spacing.xxl, justifyContent: 'center', padding: theme.spacing.xl, paddingBottom: theme.spacing.xxl }} keyboardShouldPersistTaps="handled">
+        <View style={{ alignItems: 'flex-start', flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View accessible accessibilityLabel="Aster customer support" style={{ alignItems: 'center', backgroundColor: theme.colors.surfaceRaised, borderColor: theme.colors.border, borderRadius: theme.radius.lg, borderWidth: 1, height: 64, justifyContent: 'center', width: 64 }}><Ionicons color={theme.colors.accent} name="shield-checkmark-outline" size={32} /></View>
+          <ThemeToggle />
         </View>
-        <ThemeToggle />
-      </View>
-
-      <Text style={{ color: theme.colors.textSecondary, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.body.fontSize, lineHeight: theme.typography.body.lineHeight }}>
-        {appAbout.about}
-      </Text>
-
-      <Pressable
-        accessibilityHint="Opens the Home experience"
-        accessibilityLabel="Open Home"
-        accessibilityRole="button"
-        onPress={() => router.replace('/home')}
-        style={({ pressed }) => ({ alignItems: 'center', backgroundColor: theme.colors.primary, borderRadius: theme.radius.md, justifyContent: 'center', minHeight: 48, opacity: pressed ? theme.opacity.pressed : 1, paddingHorizontal: theme.spacing.lg })}
-      >
-        <Text style={{ color: theme.colors.onPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.body.fontSize }}>
-          Open Home
-        </Text>
-      </Pressable>
-
-      <View style={{ backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderRadius: theme.radius.lg, borderWidth: 1, gap: theme.spacing.sm, padding: theme.spacing.lg }}>
-        <Text style={{ color: theme.colors.textPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.label.fontSize, lineHeight: theme.typography.label.lineHeight }}>
-          Theme reference
-        </Text>
-        <Text style={{ color: theme.colors.textMuted, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.label.fontSize, lineHeight: theme.typography.label.lineHeight }}>
-          Active mode: {mode} · Version {appAbout.version}
-        </Text>
-      </View>
-
-      <TokenSection title="Semantic colors" theme={theme}>
-        {Object.entries(theme.colors).map(([name, value]) => (
-          <View key={name} style={{ alignItems: 'center', flexDirection: 'row', gap: theme.spacing.md }}>
-            <View style={{ backgroundColor: value, borderColor: theme.colors.border, borderRadius: theme.radius.md, borderWidth: 1, height: 44, width: 44 }} />
-            <View style={{ flex: 1 }}>
-              <Text style={{ color: theme.colors.textPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.label.fontSize }}>{name}</Text>
-              <Text style={{ color: theme.colors.textMuted, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.label.fontSize }}>{value}</Text>
-            </View>
-          </View>
-        ))}
-      </TokenSection>
-
-      <TokenSection title="Typography" theme={theme}>
-        {Object.entries(theme.typography).map(([name, value]) => (
-          <View key={name} style={{ gap: theme.spacing.xs }}>
-            <Text style={{ color: theme.colors.textPrimary, fontFamily: theme.fontFamily.semibold, ...value }}>{name} — Aster support</Text>
-            <Text style={{ color: theme.colors.textMuted, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.label.fontSize }}>{value.fontSize}px · {value.lineHeight}px line height</Text>
-          </View>
-        ))}
-      </TokenSection>
-
-      <TokenSection title="Font families" theme={theme}>
-        {Object.entries(theme.fontFamily).map(([name, value]) => (
-          <View key={name} style={{ gap: theme.spacing.xs }}>
-            <Text style={{ color: theme.colors.textPrimary, fontFamily: value, fontSize: theme.typography.body.fontSize }}>{name} — Inter</Text>
-            <Text style={{ color: theme.colors.textMuted, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.label.fontSize }}>{value}</Text>
-          </View>
-        ))}
-      </TokenSection>
-
-      <TokenSection title="Spacing" theme={theme}>
-        {Object.entries(theme.spacing).map(([name, value]) => (
-          <View key={name} style={{ gap: theme.spacing.xs }}>
-            <View style={{ backgroundColor: theme.colors.accent, borderRadius: theme.radius.pill, height: 8, opacity: theme.opacity.pressed, width: value * 6 }} />
-            <Text style={{ color: theme.colors.textMuted, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.label.fontSize }}>{name} — {value}px</Text>
-          </View>
-        ))}
-      </TokenSection>
-
-      <TokenSection title="Radius and opacity" theme={theme}>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.md }}>
-          {Object.entries(theme.radius).map(([name, value]) => (
-            <View key={name} style={{ alignItems: 'center', gap: theme.spacing.xs }}>
-              <View style={{ backgroundColor: theme.colors.surfaceRaised, borderColor: theme.colors.border, borderRadius: value, borderWidth: 1, height: 52, width: 72 }} />
-              <Text style={{ color: theme.colors.textMuted, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.label.fontSize }}>{name} · {value}px</Text>
-            </View>
-          ))}
+        <View style={{ gap: theme.spacing.md }}>
+          <Text style={{ color: theme.colors.accent, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.eyebrow.fontSize, letterSpacing: theme.typography.eyebrow.letterSpacing, lineHeight: theme.typography.eyebrow.lineHeight }}>CELCOMDIGI SUPPORT</Text>
+          <Text style={{ color: theme.colors.textPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.title.fontSize, letterSpacing: theme.typography.title.letterSpacing, lineHeight: theme.typography.title.lineHeight }}>Welcome to {appAbout.name}</Text>
+          <Text style={{ color: theme.colors.textSecondary, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.body.fontSize, lineHeight: theme.typography.body.lineHeight }}>Sign in to explore Aster’s customer-support workspace.</Text>
         </View>
-        {Object.entries(theme.opacity).map(([name, value]) => (
-          <View key={name} style={{ gap: theme.spacing.xs }}>
-            <View style={{ backgroundColor: theme.colors.primary, borderRadius: theme.radius.sm, height: 28, opacity: value }} />
-            <Text style={{ color: theme.colors.textMuted, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.label.fontSize }}>{name} — {value}</Text>
-          </View>
-        ))}
-      </TokenSection>
-
-      <TokenSection title="Shadow, elevation, and focus" theme={theme}>
-        <View style={{ backgroundColor: theme.colors.surface, borderRadius: theme.radius.md, padding: theme.spacing.lg, ...theme.shadow.card }}>
-          <Text style={{ color: theme.colors.textPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.label.fontSize }}>
-            card shadow · elevation {theme.shadow.card.elevation}
-          </Text>
+        <View style={{ backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderRadius: theme.radius.lg, borderWidth: 1, gap: theme.spacing.lg, padding: theme.spacing.lg, ...theme.shadow.card }}>
+          {authStep === 'phoneEntry' ? (
+            <>
+              <View style={{ gap: theme.spacing.xs }}>
+                <Text style={{ color: theme.colors.textPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.body.fontSize }}>Use your CelcomDigi number</Text>
+                <Text style={{ color: theme.colors.textSecondary, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.label.fontSize, lineHeight: theme.typography.label.lineHeight }}>Demo test number: {authConstants.demoCelcomDigiNumberDisplay}</Text>
+              </View>
+              <View style={{ gap: theme.spacing.sm }}>
+                <Text style={{ color: theme.colors.textPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.label.fontSize }}>Mobile number</Text>
+                <TextInput accessibilityHint="Enter the supported CelcomDigi demo number" accessibilityLabel="Mobile number" autoComplete="tel" keyboardType="phone-pad" onChangeText={(value) => setPhoneNumber(normalizeMalaysianPhoneNumber(value).slice(0, 12))} placeholder="011-0000-0000" placeholderTextColor={theme.colors.textMuted} style={{ backgroundColor: theme.colors.background, borderColor: theme.colors.border, borderRadius: theme.radius.md, borderWidth: 1, color: theme.colors.textPrimary, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.body.fontSize, minHeight: 52, paddingHorizontal: theme.spacing.md }} textContentType="telephoneNumber" value={phoneNumber} />
+              </View>
+              <Pressable accessibilityHint="Checks the supported demo number and opens the non-production OTP confirmation" accessibilityLabel="Continue with CelcomDigi number" accessibilityRole="button" disabled={isSubmitting} onPress={continueWithCelcomDigiNumber} style={({ pressed }) => ({ alignItems: 'center', backgroundColor: theme.colors.primary, borderRadius: theme.radius.md, justifyContent: 'center', minHeight: 52, opacity: isSubmitting ? theme.opacity.disabled : pressed ? theme.opacity.pressed : 1, paddingHorizontal: theme.spacing.lg })}><Text style={{ color: theme.colors.onPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.body.fontSize }}>Continue with CelcomDigi number</Text></Pressable>
+              <Pressable accessibilityHint="Explains the random demo number availability" accessibilityLabel="Use a random demo number" accessibilityRole="button" onPress={showRandomDemoUnavailable} style={({ pressed }) => ({ alignItems: 'center', borderColor: theme.colors.border, borderRadius: theme.radius.md, borderWidth: 1, justifyContent: 'center', minHeight: 52, opacity: pressed ? theme.opacity.pressed : 1, paddingHorizontal: theme.spacing.lg })}><Text style={{ color: theme.colors.textPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.body.fontSize }}>Use a random demo number</Text></Pressable>
+            </>
+          ) : (
+            <>
+              <Pressable accessibilityHint="Returns to mobile number entry without authenticating" accessibilityLabel="Use a different number" accessibilityRole="button" disabled={isSubmitting} onPress={() => setAuthStep('phoneEntry')} style={({ pressed }) => ({ alignItems: 'center', alignSelf: 'flex-start', flexDirection: 'row', gap: theme.spacing.sm, minHeight: 48, opacity: isSubmitting ? theme.opacity.disabled : pressed ? theme.opacity.pressed : 1 })}><Ionicons color={theme.colors.primary} name="arrow-back" size={20} /><Text style={{ color: theme.colors.primary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.label.fontSize }}>Use a different number</Text></Pressable>
+              <View style={{ gap: theme.spacing.sm }}>
+                <Text style={{ color: theme.colors.accent, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.eyebrow.fontSize, letterSpacing: theme.typography.eyebrow.letterSpacing }}>DEMO OTP STEP</Text>
+                <Text style={{ color: theme.colors.textPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.title.fontSize, lineHeight: theme.typography.title.lineHeight }}>Continue to Aster</Text>
+                <Text style={{ color: theme.colors.textSecondary, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.body.fontSize, lineHeight: theme.typography.body.lineHeight }}>{authConstants.demoCelcomDigiNumberDisplay} is eligible for this local walkthrough.</Text>
+              </View>
+              <View accessibilityRole="text" style={{ backgroundColor: theme.colors.warningSoft, borderColor: theme.colors.border, borderRadius: theme.radius.md, borderWidth: 1, flexDirection: 'row', gap: theme.spacing.md, padding: theme.spacing.md }}><Ionicons color={theme.colors.warning} name="information-circle-outline" size={22} /><Text style={{ color: theme.colors.textSecondary, flex: 1, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.label.fontSize, lineHeight: theme.typography.label.lineHeight }}>{authCopy.otpPendingMessage} No OTP was sent, received, entered, or verified.</Text></View>
+              <Pressable accessibilityHint="Creates a one-day local demo session and opens Aster" accessibilityLabel="Proceed to Aster" accessibilityRole="button" disabled={isSubmitting} onPress={() => void proceedWithCelcomDigiDemo()} style={({ pressed }) => ({ alignItems: 'center', backgroundColor: theme.colors.primary, borderRadius: theme.radius.md, justifyContent: 'center', minHeight: 52, opacity: isSubmitting ? theme.opacity.disabled : pressed ? theme.opacity.pressed : 1, paddingHorizontal: theme.spacing.lg })}>{isSubmitting ? <ActivityIndicator color={theme.colors.onPrimary} /> : <Text style={{ color: theme.colors.onPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.body.fontSize }}>Proceed to Aster</Text>}</Pressable>
+            </>
+          )}
         </View>
-        <View style={{ borderColor: theme.colors.focusRing, borderRadius: theme.radius.md, borderWidth: 3, padding: theme.spacing.lg }}>
-          <Text style={{ color: theme.colors.textPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.label.fontSize }}>
-            focusRing — {theme.colors.focusRing}
-          </Text>
-        </View>
-      </TokenSection>
-
-      <TokenSection title="Overlay reference" theme={theme}>
-        <Text style={{ color: theme.colors.textSecondary, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.label.fontSize, lineHeight: theme.typography.label.lineHeight }}>
-          Open each Phase 3 overlay type to verify its presentation, dismissal, and theme integration.
-        </Text>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.sm }}>
-          <OverlayDemoButton label="Alert" theme={theme} onPress={() => overlay.alert({ message: 'Your support case details are ready to review.', title: 'Case updated' })} />
-          <OverlayDemoButton label="Confirm" theme={theme} onPress={() => overlay.confirm({ message: 'This demonstrates a confirmation callback after the exit animation.', onConfirm: () => overlay.toast({ message: 'Confirmation completed.', tone: 'success' }), title: 'Confirm action' })} />
-          <OverlayDemoButton label="Destructive" theme={theme} onPress={() => overlay.destructiveConfirm({ message: 'This only demonstrates the destructive confirmation treatment.', onConfirm: () => overlay.toast({ message: 'Destructive action confirmed.', tone: 'warning' }), title: 'Remove draft' })} />
-          <OverlayDemoButton label="Custom modal" theme={theme} onPress={() => overlay.customModal({ content: <OverlayDemoContent heading="Custom modal" message="Custom content is hosted in the shared centered modal surface." theme={theme} /> })} />
-          <OverlayDemoButton label="Bottom sheet" theme={theme} onPress={() => overlay.bottomSheet({ content: <OverlayDemoContent heading="Bottom sheet" message="Use the 44-point handle above to drag this sheet downward." theme={theme} /> })} />
-          <OverlayDemoButton label="Loader" theme={theme} onPress={() => overlay.showLoader({ duration: 1800, label: 'Refreshing support details…' })} />
-          <OverlayDemoButton label="Success toast" theme={theme} onPress={() => overlay.toast({ message: 'Your support request was saved.', tone: 'success' })} />
-          <OverlayDemoButton label="Warning toast" theme={theme} onPress={() => overlay.toast({ message: 'Additional information is needed.', tone: 'warning' })} />
-        </View>
-      </TokenSection>
-    </ScrollView>
-  );
-}
-
-type TokenSectionProps = {
-  children: ReactNode;
-  theme: Theme;
-  title: string;
-};
-
-function TokenSection({ children, theme, title }: TokenSectionProps) {
-  return (
-    <View style={{ backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderRadius: theme.radius.lg, borderWidth: 1, gap: theme.spacing.lg, padding: theme.spacing.lg }}>
-      <Text style={{ color: theme.colors.textPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.body.fontSize, lineHeight: theme.typography.body.lineHeight }}>
-        {title}
-      </Text>
-      {children}
-    </View>
-  );
-}
-
-function OverlayDemoButton({ label, onPress, theme }: { label: string; onPress: () => void; theme: Theme }) {
-  return (
-    <Pressable
-      accessibilityRole="button"
-      onPress={onPress}
-      style={({ pressed }) => ({ alignItems: 'center', backgroundColor: theme.colors.primary, borderRadius: theme.radius.md, justifyContent: 'center', minHeight: 44, opacity: pressed ? theme.opacity.pressed : 1, paddingHorizontal: theme.spacing.md })}
-    >
-      <Text style={{ color: theme.colors.onPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.label.fontSize }}>
-        {label}
-      </Text>
-    </Pressable>
-  );
-}
-
-function OverlayDemoContent({ heading, message, theme }: { heading: string; message: string; theme: Theme }) {
-  return (
-    <View style={{ gap: theme.spacing.sm }}>
-      <Text style={{ color: theme.colors.textPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.body.fontSize, lineHeight: theme.typography.body.lineHeight }}>
-        {heading}
-      </Text>
-      <Text style={{ color: theme.colors.textSecondary, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.label.fontSize, lineHeight: theme.typography.label.lineHeight }}>
-        {message}
-      </Text>
-    </View>
+        <View accessibilityRole="text" style={{ backgroundColor: theme.colors.infoSoft, borderColor: theme.colors.border, borderRadius: theme.radius.md, borderWidth: 1, flexDirection: 'row', gap: theme.spacing.md, padding: theme.spacing.md }}><Ionicons color={theme.colors.info} name="information-circle-outline" size={22} /><Text style={{ color: theme.colors.textSecondary, flex: 1, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.label.fontSize, lineHeight: theme.typography.label.lineHeight }}>{authCopy.nonProductionNotice}</Text></View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
