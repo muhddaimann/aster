@@ -1,6 +1,13 @@
 ignore about.txt, its my scratchpad
 review this expo blank template
 
+Aster
+A native digital customer-support and ticketing platform that enables CelcomDigi Business customers to submit, manage and track support enquiries through a structured mobile experience.
+
+review bottomsheet
+and android, onPress bottomSheet button make flickering bottom sheet appear twice
+advice
+
 Auth Module
 based on app about, design direction
 total redesign LandingScreen as login screen
@@ -18,9 +25,34 @@ src/
     └── useAuth.ts
 advice
 
-Aster
-A native digital customer-support and ticketing platform that enables CelcomDigi Business customers to submit, manage and track support enquiries through a structured mobile experience.
-
-review bottomsheet
-and android, onPress bottomSheet button make flickering bottom sheet appear twice
+Profile Module
+based on app about, design direction
+rename settings/demo as settings/profile
+profile/index as a page to read, update customer details
+constant to keep types, dummy data etc
+contexts to keep flow, update etc
+hooks to use it globally
+app/
+├─ (tabs)/
+│  ├─ home/
+│  │  ├─ demo/
+│  │  │  └─ index.tsx
+│  │  ├─ _layout.tsx
+│  │  └─ index.tsx
+│  ├─ settings/
+│  │  ├─ profile/
+│  │  │  └─ index.tsx
+│  │  ├─ _layout.tsx
+│  │  └─ index.tsx
+│  └─ _layout.tsx
+├─ _layout.tsx
+└─ index.tsx
+src/
+├── constants/
+│   └── profile.ts
+├── contexts/
+│   └── profileContext.ts
+└── hooks/
+    └── useProfile.ts
 advice
+
