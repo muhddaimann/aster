@@ -4,10 +4,14 @@ export const appAbout = {
     'Customer Support and Ticketing platform for CelcomDigi Telco customers to submit and manage support enquiries.',
   slug: 'aster-support',
   scheme: 'aster',
-  version: '0.4.0',
+  version: '0.5.0',
   designDirection:
     'A calm, trustworthy telco-support experience built on deep navy and bright cyan accents.',
   changelog: [
+    {
+      version: '0.5.0',
+      summary: 'Refined shared screen controls and moved local ticket submission into a readiness-gated fixed header action.',
+    },
     {
       version: '0.4.0',
       summary: 'Added session-only local support tickets with records, conversations, and refined shared screen navigation controls.',

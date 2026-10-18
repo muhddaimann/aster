@@ -86,3 +86,14 @@ src/
 └── hooks/
     └── useTicket.ts
 advice
+
+based on app design direction
+AppScreen need total redesign
+advice
+
+AppScreen
+the feature of showback and rightSlot to be position absolute
+the idea is when on scroll, showback and rightSlot stays the same place but
+title subtitle scrolled as before
+do not move title subtitle from current top row
+advice

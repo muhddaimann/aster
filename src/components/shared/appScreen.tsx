@@ -14,6 +14,7 @@ type AppScreenProps = {
   onRefresh?: () => void;
   refreshing?: boolean;
   rightSlot?: ReactNode;
+  rightSlotReservedWidth?: number;
   routeKind: BarRouteKind;
   scrollEnabled?: boolean;
   subtitle?: string;
@@ -24,7 +25,7 @@ type ScrollControllerRef = {
   scrollTo: (options: { animated?: boolean; x?: number; y?: number }) => void;
 };
 
-export function AppScreen({ children, onBack, onRefresh, refreshing = false, rightSlot, routeKind, scrollEnabled = true, subtitle, title }: AppScreenProps) {
+export function AppScreen({ children, onBack, onRefresh, refreshing = false, rightSlot, rightSlotReservedWidth = 48, routeKind, scrollEnabled = true, subtitle, title }: AppScreenProps) {
   const { theme } = useTheme();
   const { registerScreen, reportScroll } = useBar();
   const scrollViewRef = useRef<ScrollControllerRef | null>(null);
@@ -37,11 +38,11 @@ export function AppScreen({ children, onBack, onRefresh, refreshing = false, rig
 
   useEffect(() => {
     presence.setValue(0);
-    Animated.timing(presence, { duration: 180, toValue: 1, useNativeDriver: true }).start();
+    Animated.timing(presence, { duration: 200, toValue: 1, useNativeDriver: true }).start();
   }, [presence]);
 
   return (
-    <Animated.View style={{ backgroundColor: theme.colors.background, flex: 1, transform: [{ translateY: presence.interpolate({ inputRange: [0, 1], outputRange: [6, 0] }) }] }}>
+    <Animated.View style={{ backgroundColor: theme.colors.background, flex: 1, opacity: presence, transform: [{ translateY: presence.interpolate({ inputRange: [0, 1], outputRange: [10, 0] }) }] }}>
       {scrollEnabled ? (
         <ScrollView
           contentContainerStyle={{ gap: theme.spacing.xl, padding: theme.spacing.xl, paddingBottom: routeKind === 'root' ? layout.rootScreenBottomClearance : theme.spacing.xxl }}
@@ -52,36 +53,44 @@ export function AppScreen({ children, onBack, onRefresh, refreshing = false, rig
           style={{ flex: 1 }}
           showsVerticalScrollIndicator={false}
         >
-          <ScreenContent onBack={onBack} rightSlot={rightSlot} subtitle={subtitle} theme={theme} title={title}>
+          <ScreenContent hasBackControl={Boolean(onBack)} rightSlotReservedWidth={rightSlot ? rightSlotReservedWidth : 0} subtitle={subtitle} theme={theme} title={title}>
             {children}
           </ScreenContent>
         </ScrollView>
       ) : (
         <View style={{ flex: 1, gap: theme.spacing.xl, padding: theme.spacing.xl, paddingBottom: routeKind === 'root' ? layout.rootScreenBottomClearance : theme.spacing.xxl }}>
-          <ScreenContent onBack={onBack} rightSlot={rightSlot} subtitle={subtitle} theme={theme} title={title}>
+          <ScreenContent hasBackControl={Boolean(onBack)} rightSlotReservedWidth={rightSlot ? rightSlotReservedWidth : 0} subtitle={subtitle} theme={theme} title={title}>
             {children}
           </ScreenContent>
         </View>
       )}
+      {onBack || rightSlot ? (
+        <View pointerEvents="box-none" style={{ left: 0, position: 'absolute', right: 0, top: theme.spacing.xl }}>
+          {onBack ? <View style={{ left: theme.spacing.xl, position: 'absolute', top: 0 }}><BackControl onPress={onBack} theme={theme} /></View> : null}
+          {rightSlot ? <View style={{ position: 'absolute', right: theme.spacing.xl, top: 0 }}>{rightSlot}</View> : null}
+        </View>
+      ) : null}
       {routeKind === 'nested' ? <FloatingControls /> : null}
     </Animated.View>
   );
 }
 
-function ScreenContent({ children, onBack, rightSlot, subtitle, theme, title }: Pick<AppScreenProps, 'children' | 'onBack' | 'rightSlot' | 'subtitle' | 'title'> & { theme: ReturnType<typeof useTheme>['theme'] }) {
+function ScreenContent({ children, hasBackControl, rightSlotReservedWidth, subtitle, theme, title }: Pick<AppScreenProps, 'children' | 'subtitle' | 'title'> & { hasBackControl: boolean; rightSlotReservedWidth: number; theme: ReturnType<typeof useTheme>['theme'] }) {
+  const hasHeader = Boolean(title || subtitle);
+
   return (
     <>
-      {title || subtitle || rightSlot || onBack ? (
-        <View style={{ alignItems: 'center', flexDirection: 'row', gap: theme.spacing.md }}>
-          {onBack ? <Pressable accessibilityLabel="Go back" accessibilityRole="button" onPress={onBack} style={({ pressed }) => ({ alignItems: 'center', backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderRadius: theme.radius.pill, borderWidth: 1, height: 44, justifyContent: 'center', opacity: pressed ? theme.opacity.pressed : 1, width: 44 })}><Ionicons color={theme.colors.textPrimary} name="chevron-back" size={24} /></Pressable> : null}
-          <View style={{ flex: 1, flexShrink: 1, gap: theme.spacing.xs }}>
-            {subtitle ? <Text style={{ color: theme.colors.accent, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.eyebrow.fontSize, letterSpacing: theme.typography.eyebrow.letterSpacing, lineHeight: theme.typography.eyebrow.lineHeight }}>{subtitle}</Text> : null}
-            {title ? <Text style={{ color: theme.colors.textPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.title.fontSize, letterSpacing: theme.typography.title.letterSpacing, lineHeight: theme.typography.title.lineHeight }}>{title}</Text> : null}
-          </View>
-          {rightSlot}
+      {hasHeader ? (
+        <View style={{ gap: theme.spacing.xs, paddingLeft: hasBackControl ? 44 + theme.spacing.md : 0, paddingRight: rightSlotReservedWidth ? rightSlotReservedWidth + theme.spacing.md : 0 }}>
+            {title ? <Text style={{ color: theme.colors.primary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.body.fontSize, lineHeight: theme.typography.body.lineHeight }}>{title}</Text> : null}
+            {subtitle ? <Text style={{ color: theme.colors.textSecondary, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.label.fontSize, lineHeight: theme.typography.label.lineHeight }}>{subtitle}</Text> : null}
         </View>
       ) : null}
       {children}
     </>
   );
+}
+
+function BackControl({ onPress, theme }: { onPress: () => void; theme: ReturnType<typeof useTheme>['theme'] }) {
+  return <Pressable accessibilityHint="Returns to the previous support screen" accessibilityLabel="Go back" accessibilityRole="button" onPress={onPress} style={({ pressed }) => ({ alignItems: 'center', backgroundColor: theme.colors.surface, borderColor: pressed ? theme.colors.focusRing : theme.colors.border, borderRadius: theme.radius.pill, borderWidth: 1, height: 44, justifyContent: 'center', opacity: pressed ? theme.opacity.pressed : 1, width: 44 })}><Ionicons color={theme.colors.textPrimary} name="chevron-back" size={24} /></Pressable>;
 }
