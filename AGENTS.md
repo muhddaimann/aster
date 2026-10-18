@@ -448,3 +448,12 @@ Do not make changes.
 - Dismissal behavior: dialogs and sheets dismiss through one exit lifecycle; callbacks run only after exit motion. Toasts replace prior content safely, respect top safe-area spacing, and remain until exit animation completes.
 - Bottom sheets: full-width sheet surfaces extend to the physical bottom; content reserves bottom inset plus token spacing. Drag handling is limited to a 44-point handle target, uses React Native `Animated` and `PanResponder`, springs back after insufficient/terminated downward drags, and dismisses at 18% of measured height or vertical velocity above `0.7`.
 - Validation: `npx tsc --noEmit`, public Expo config inspection, iOS/Android Expo exports, and `git diff --check`; manually verify overlay behavior, Android edge-to-edge output, status-bar readability, gestures, callbacks, and light/dark presentation on iOS and Android.
+
+### Phase 4 — Tabs Module
+
+- Routing: the root LandingScreen remains at `/`; Home and Settings live in an Expo Router `(tabs)` group with nested generic `demo/` placeholder routes. Root, tab, and nested stacks disable native headers and route animations.
+- Primary navigation: Expo Router’s standard tab bar remains hidden. A reusable floating `BottomBar` is rendered only on Home and Settings root screens; nested routes are full-screen without it.
+- Tab behavior: bottom-bar targets use theme tokens, `@expo/vector-icons`, session theme styling, bottom safe-area positioning, 48-point minimum targets, press-scale feedback, and accessibility tab semantics. Active-tab presses are no-ops; inactive-tab switches use replacement navigation.
+- Landing flow: LandingScreen replaces to Home; Home replaces back to LandingScreen.
+- Dependencies/configuration: no Phase 4 dependencies or Expo configuration were added.
+- Validation: `npx tsc --noEmit`, iOS/Android Expo exports, and `git diff --check`; manually verify tab selection/no-op behavior, nested-route bar visibility, safe-area placement, disabled route transitions, and LandingScreen/Home navigation on iOS and Android.

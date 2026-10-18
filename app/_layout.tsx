@@ -40,7 +40,7 @@ function RootShell() {
   return (
     <SafeAreaView edges={['top']} style={{ backgroundColor: theme.colors.background, flex: 1 }}>
       <StatusBar style={isOverlayActive || mode === 'dark' ? 'light' : 'dark'} />
-      <Stack screenOptions={{ headerShown: false }} />
+      <Stack screenOptions={{ animation: 'none', headerShown: false }} />
     </SafeAreaView>
   );
 }

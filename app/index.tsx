@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import type { ReactNode } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { ThemeToggle } from '../src/components/theme/themeToggle';
@@ -10,6 +11,7 @@ import { useTheme } from '../src/hooks/useTheme';
 export default function LandingScreen() {
   const { mode, theme } = useTheme();
   const overlay = useOverlay();
+  const router = useRouter();
 
   return (
     <ScrollView
@@ -48,6 +50,18 @@ export default function LandingScreen() {
       <Text style={{ color: theme.colors.textSecondary, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.body.fontSize, lineHeight: theme.typography.body.lineHeight }}>
         {appAbout.about}
       </Text>
+
+      <Pressable
+        accessibilityHint="Opens the Home experience"
+        accessibilityLabel="Open Home"
+        accessibilityRole="button"
+        onPress={() => router.replace('/home')}
+        style={({ pressed }) => ({ alignItems: 'center', backgroundColor: theme.colors.primary, borderRadius: theme.radius.md, justifyContent: 'center', minHeight: 48, opacity: pressed ? theme.opacity.pressed : 1, paddingHorizontal: theme.spacing.lg })}
+      >
+        <Text style={{ color: theme.colors.onPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.body.fontSize }}>
+          Open Home
+        </Text>
+      </Pressable>
 
       <View style={{ backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderRadius: theme.radius.lg, borderWidth: 1, gap: theme.spacing.sm, padding: theme.spacing.lg }}>
         <Text style={{ color: theme.colors.textPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.label.fontSize, lineHeight: theme.typography.label.lineHeight }}>
