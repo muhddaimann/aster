@@ -1,13 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ReactNode } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { ThemeToggle } from '../src/components/theme/themeToggle';
 import { appAbout } from '../src/constants/about';
 import type { Theme } from '../src/constants/theme';
+import { useOverlay } from '../src/hooks/useOverlay';
 import { useTheme } from '../src/hooks/useTheme';
 
 export default function LandingScreen() {
   const { mode, theme } = useTheme();
+  const overlay = useOverlay();
 
   return (
     <ScrollView
@@ -124,6 +126,22 @@ export default function LandingScreen() {
           </Text>
         </View>
       </TokenSection>
+
+      <TokenSection title="Overlay reference" theme={theme}>
+        <Text style={{ color: theme.colors.textSecondary, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.label.fontSize, lineHeight: theme.typography.label.lineHeight }}>
+          Open each Phase 3 overlay type to verify its presentation, dismissal, and theme integration.
+        </Text>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.sm }}>
+          <OverlayDemoButton label="Alert" theme={theme} onPress={() => overlay.alert({ message: 'Your support case details are ready to review.', title: 'Case updated' })} />
+          <OverlayDemoButton label="Confirm" theme={theme} onPress={() => overlay.confirm({ message: 'This demonstrates a confirmation callback after the exit animation.', onConfirm: () => overlay.toast({ message: 'Confirmation completed.', tone: 'success' }), title: 'Confirm action' })} />
+          <OverlayDemoButton label="Destructive" theme={theme} onPress={() => overlay.destructiveConfirm({ message: 'This only demonstrates the destructive confirmation treatment.', onConfirm: () => overlay.toast({ message: 'Destructive action confirmed.', tone: 'warning' }), title: 'Remove draft' })} />
+          <OverlayDemoButton label="Custom modal" theme={theme} onPress={() => overlay.customModal({ content: <OverlayDemoContent heading="Custom modal" message="Custom content is hosted in the shared centered modal surface." theme={theme} /> })} />
+          <OverlayDemoButton label="Bottom sheet" theme={theme} onPress={() => overlay.bottomSheet({ content: <OverlayDemoContent heading="Bottom sheet" message="Use the 44-point handle above to drag this sheet downward." theme={theme} /> })} />
+          <OverlayDemoButton label="Loader" theme={theme} onPress={() => overlay.showLoader({ duration: 1800, label: 'Refreshing support details…' })} />
+          <OverlayDemoButton label="Success toast" theme={theme} onPress={() => overlay.toast({ message: 'Your support request was saved.', tone: 'success' })} />
+          <OverlayDemoButton label="Warning toast" theme={theme} onPress={() => overlay.toast({ message: 'Additional information is needed.', tone: 'warning' })} />
+        </View>
+      </TokenSection>
     </ScrollView>
   );
 }
@@ -141,6 +159,33 @@ function TokenSection({ children, theme, title }: TokenSectionProps) {
         {title}
       </Text>
       {children}
+    </View>
+  );
+}
+
+function OverlayDemoButton({ label, onPress, theme }: { label: string; onPress: () => void; theme: Theme }) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => ({ alignItems: 'center', backgroundColor: theme.colors.primary, borderRadius: theme.radius.md, justifyContent: 'center', minHeight: 44, opacity: pressed ? theme.opacity.pressed : 1, paddingHorizontal: theme.spacing.md })}
+    >
+      <Text style={{ color: theme.colors.onPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.label.fontSize }}>
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
+function OverlayDemoContent({ heading, message, theme }: { heading: string; message: string; theme: Theme }) {
+  return (
+    <View style={{ gap: theme.spacing.sm }}>
+      <Text style={{ color: theme.colors.textPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.body.fontSize, lineHeight: theme.typography.body.lineHeight }}>
+        {heading}
+      </Text>
+      <Text style={{ color: theme.colors.textSecondary, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.label.fontSize, lineHeight: theme.typography.label.lineHeight }}>
+        {message}
+      </Text>
     </View>
   );
 }

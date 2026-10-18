@@ -437,3 +437,14 @@ Do not make changes.
 - Status bar: follows the resolved theme for readable system icons.
 - Theme control: reusable 48-point icon-only switch using `@expo/vector-icons`, accessible labels/state, and native-driver press-scale feedback.
 - Themed UI uses token-driven inline styles; the landing route remains a scrollable visual reference for active tokens.
+
+### Phase 3 — Theme-Aware Global Overlay System
+
+- Overlay architecture: `OverlayContext` defines the typed contract; `OverlayProvider` owns overlay/toast state, timer cleanup, and single-invocation completion; `OverlayHost` renders modal and toast UI; `useOverlay()` is the consumer API.
+- Supported overlay APIs: alert, confirmation, destructive confirmation, custom modal, bottom sheet, blocking loader, toast, and `dismiss(onComplete?)` for work that must occur after exit animation completion.
+- Root integration: `OverlayProvider` is mounted beneath the theme provider; `OverlayHost` is rendered outside the route-only root safe-area wrapper so modal backdrops cover the full window. Blocking overlay activity selects a readable light status-bar style.
+- Visual tokens: light/dark overlay backdrop and semantic success, danger, warning, and info colors with soft counterparts are defined in the theme. Dialog, loader, and toast surfaces use a dedicated zero-elevation overlay shadow token to avoid Android rectangular elevation artifacts.
+- Android: `edgeToEdgeEnabled: true` is enabled. Android system-bar coverage must be verified in a rebuilt native development build or binary.
+- Dismissal behavior: dialogs and sheets dismiss through one exit lifecycle; callbacks run only after exit motion. Toasts replace prior content safely, respect top safe-area spacing, and remain until exit animation completes.
+- Bottom sheets: full-width sheet surfaces extend to the physical bottom; content reserves bottom inset plus token spacing. Drag handling is limited to a 44-point handle target, uses React Native `Animated` and `PanResponder`, springs back after insufficient/terminated downward drags, and dismisses at 18% of measured height or vertical velocity above `0.7`.
+- Validation: `npx tsc --noEmit`, public Expo config inspection, iOS/Android Expo exports, and `git diff --check`; manually verify overlay behavior, Android edge-to-edge output, status-bar readability, gestures, callbacks, and light/dark presentation on iOS and Android.

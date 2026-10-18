@@ -16,6 +16,7 @@
       "bundleIdentifier": "com.celcomdigi.aster"
     },
     "android": {
+      "edgeToEdgeEnabled": true,
       "package": "com.celcomdigi.aster",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",

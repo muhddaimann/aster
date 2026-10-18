@@ -3,7 +3,9 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { OverlayProvider } from '../src/contexts/overlayProvider';
 import { ThemeProvider } from '../src/contexts/themeContext';
+import { useOverlay } from '../src/hooks/useOverlay';
 import { useTheme } from '../src/hooks/useTheme';
 
 export default function RootLayout() {
@@ -23,7 +25,9 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <RootShell />
+        <OverlayProvider>
+          <RootShell />
+        </OverlayProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );
@@ -31,10 +35,11 @@ export default function RootLayout() {
 
 function RootShell() {
   const { mode, theme } = useTheme();
+  const { isOverlayActive } = useOverlay();
 
   return (
     <SafeAreaView edges={['top']} style={{ backgroundColor: theme.colors.background, flex: 1 }}>
-      <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
+      <StatusBar style={isOverlayActive || mode === 'dark' ? 'light' : 'dark'} />
       <Stack screenOptions={{ headerShown: false }} />
     </SafeAreaView>
   );
