@@ -7,6 +7,7 @@ import { OverlayProvider } from '../src/contexts/overlayProvider';
 import { BarProvider } from '../src/contexts/barContext';
 import { AuthProvider } from '../src/contexts/authContext';
 import { ProfileProvider } from '../src/contexts/profileContext';
+import { TicketProvider } from '../src/contexts/ticketContext';
 import { ThemeProvider } from '../src/contexts/themeContext';
 import { useOverlay } from '../src/hooks/useOverlay';
 import { useTheme } from '../src/hooks/useTheme';
@@ -31,9 +32,11 @@ export default function RootLayout() {
         <OverlayProvider>
           <AuthProvider>
             <ProfileProvider>
-              <BarProvider>
-                <RootShell />
-              </BarProvider>
+              <TicketProvider>
+                <BarProvider>
+                  <RootShell />
+                </BarProvider>
+              </TicketProvider>
             </ProfileProvider>
           </AuthProvider>
         </OverlayProvider>
@@ -49,7 +52,7 @@ function RootShell() {
   return (
     <SafeAreaView edges={['top']} style={{ backgroundColor: theme.colors.background, flex: 1 }}>
       <StatusBar style={isOverlayActive || mode === 'dark' ? 'light' : 'dark'} />
-      <Stack screenOptions={{ animation: 'none', headerShown: false }} />
+      <Stack screenOptions={{ animation: 'none', contentStyle: { backgroundColor: theme.colors.background }, headerShown: false }} />
     </SafeAreaView>
   );
 }

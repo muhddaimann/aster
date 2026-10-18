@@ -56,3 +56,33 @@ src/
     └── useProfile.ts
 advice
 
+Ticket Module
+based on app about, design direction
+rename home/demo as home/ticket/
+flow as ask customer what the need help with telco, desciption, add more remarks etc
+ticket/index to start ticket collecting details, /record to list existing tickets etc
+constant to keep types, dummy data etc
+contexts to keep flow, read, update etc
+hooks to use it globally
+app/
+├─ (tabs)/
+│  ├─ home/
+│  │  ├─ ticket/
+│  │  │  ├─ [id].tsx
+│  │  │  ├─ record.tsx
+│  │  │  └─ index.tsx
+│  │  ├─ _layout.tsx
+│  │  └─ index.tsx
+│  └─ _layout.tsx
+├─ _layout.tsx
+└─ index.tsx
+src/
+├── components/
+│   └── ticket/
+├── constants/
+│   └── ticket.ts
+├── contexts/
+│   └── ticketContext.ts
+└── hooks/
+    └── useTicket.ts
+advice

@@ -64,7 +64,7 @@ export default function ProfileScreen() {
             <ProfileDetail icon="language-outline" label="Language" value={profileLabels.language[profile.language]} />
             <ProfileDetail icon="chatbubble-ellipses-outline" label="Preferred contact" value={profileLabels.contactChannel[profile.preferredContactChannel]} />
           </View>
-          <Pressable accessibilityHint="Edits local demo profile details for this session" accessibilityLabel="Edit profile" accessibilityRole="button" onPress={beginEditing} style={({ pressed }) => ({ alignItems: 'center', backgroundColor: theme.colors.primary, borderRadius: theme.radius.md, justifyContent: 'center', minHeight: 48, opacity: pressed ? theme.opacity.pressed : 1, paddingHorizontal: theme.spacing.lg })}><Text style={{ color: theme.colors.onPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.label.fontSize }}>Edit profile</Text></Pressable>
+          <Pressable accessibilityHint="Updates local demo customer details" accessibilityLabel="Edit profile" accessibilityRole="button" onPress={beginEditing} style={({ pressed }) => ({ alignItems: 'center', backgroundColor: theme.colors.primary, borderRadius: theme.radius.md, justifyContent: 'center', minHeight: 48, opacity: pressed ? theme.opacity.pressed : 1, paddingHorizontal: theme.spacing.lg })}><Text style={{ color: theme.colors.onPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.label.fontSize }}>Edit profile</Text></Pressable>
         </>
       ) : (
         <View style={cardStyle}>

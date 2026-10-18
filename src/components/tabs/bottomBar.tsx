@@ -14,16 +14,26 @@ type BottomBarProps = {
   onTabPress: (tab: BottomBarTab) => void;
 };
 
+type FloatingControlsProps = {
+  activeTab?: BottomBarTab;
+  onTabPress?: (tab: BottomBarTab) => void;
+};
+
 export function BottomBar({ activeTab, onTabPress }: BottomBarProps) {
+  return <FloatingControls activeTab={activeTab} onTabPress={onTabPress} />;
+}
+
+export function FloatingControls({ activeTab, onTabPress }: FloatingControlsProps) {
   const { canScrollToTop, showScrollToTop, showTabBar, scrollToTop } = useBar();
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
+  const canShowTabBar = Boolean(activeTab && onTabPress && showTabBar);
   const tabOpacity = useRef(new Animated.Value(showTabBar ? 1 : 0)).current;
   const scrollOpacity = useRef(new Animated.Value(showScrollToTop ? 1 : 0)).current;
 
   useEffect(() => {
-    Animated.timing(tabOpacity, { duration: 160, toValue: showTabBar ? 1 : 0, useNativeDriver: true }).start();
-  }, [showTabBar, tabOpacity]);
+    Animated.timing(tabOpacity, { duration: 160, toValue: canShowTabBar ? 1 : 0, useNativeDriver: true }).start();
+  }, [canShowTabBar, tabOpacity]);
 
   useEffect(() => {
     Animated.timing(scrollOpacity, { duration: 160, toValue: showScrollToTop ? 1 : 0, useNativeDriver: true }).start();
@@ -31,12 +41,14 @@ export function BottomBar({ activeTab, onTabPress }: BottomBarProps) {
 
   return (
     <View pointerEvents="box-none" style={{ bottom: insets.bottom + layout.floatingControlBottomOffset, height: layout.floatingControlStageHeight, left: 0, position: 'absolute', right: 0 }}>
-      <Animated.View pointerEvents={showTabBar ? 'auto' : 'none'} style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'center', opacity: tabOpacity, position: 'absolute', width: '100%' }}>
-        <View style={{ backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderRadius: theme.radius.pill, borderWidth: 1, flexDirection: 'row', gap: theme.spacing.xs, padding: theme.spacing.xs, ...theme.shadow.card }}>
-          <BottomBarItem active={activeTab === 'home'} icon="home-outline" label="Home" onPress={() => onTabPress('home')} theme={theme} />
-          <BottomBarItem active={activeTab === 'settings'} icon="settings-outline" label="Settings" onPress={() => onTabPress('settings')} theme={theme} />
-        </View>
-      </Animated.View>
+      {activeTab && onTabPress ? (
+        <Animated.View pointerEvents={canShowTabBar ? 'auto' : 'none'} style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'center', opacity: tabOpacity, position: 'absolute', width: '100%' }}>
+          <View style={{ backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderRadius: theme.radius.pill, borderWidth: 1, flexDirection: 'row', gap: theme.spacing.xs, padding: theme.spacing.xs, ...theme.shadow.card }}>
+            <BottomBarItem active={activeTab === 'home'} icon="home-outline" label="Home" onPress={() => onTabPress('home')} theme={theme} />
+            <BottomBarItem active={activeTab === 'settings'} icon="settings-outline" label="Settings" onPress={() => onTabPress('settings')} theme={theme} />
+          </View>
+        </Animated.View>
+      ) : null}
       <Animated.View pointerEvents={showScrollToTop && canScrollToTop ? 'auto' : 'none'} style={{ alignItems: 'center', opacity: scrollOpacity, position: 'absolute', width: '100%' }}>
         <ScrollTopButton onPress={scrollToTop} theme={theme} />
       </Animated.View>

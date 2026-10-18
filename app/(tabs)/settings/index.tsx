@@ -41,7 +41,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <View style={{ backgroundColor: theme.colors.background, flex: 1 }}>
+    <>
       <AppScreen routeKind="root" subtitle="PREFERENCES" title="Settings">
         <View style={{ alignItems: 'center', backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderRadius: theme.radius.lg, borderWidth: 1, flexDirection: 'row', gap: theme.spacing.lg, justifyContent: 'space-between', padding: theme.spacing.lg }}>
           <View style={{ flex: 1, gap: theme.spacing.xs }}>
@@ -56,6 +56,6 @@ export default function SettingsScreen() {
         <Pressable accessibilityHint="Removes the local demo session and returns to login" accessibilityLabel="Log out" accessibilityRole="button" onPress={confirmLogout} style={({ pressed }) => ({ alignItems: 'center', borderColor: theme.colors.danger, borderRadius: theme.radius.md, borderWidth: 1, justifyContent: 'center', minHeight: 48, opacity: pressed ? theme.opacity.pressed : 1, paddingHorizontal: theme.spacing.lg })}><Text style={{ color: theme.colors.danger, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.label.fontSize }}>Log out</Text></Pressable>
       </AppScreen>
       <BottomBar activeTab="settings" onTabPress={(tab) => { if (tab !== 'settings') router.replace('/home'); }} />
-    </View>
+    </>
   );
 }

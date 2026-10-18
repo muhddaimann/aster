@@ -16,7 +16,7 @@ export default function TabsLayout() {
   }
 
   return (
-    <Tabs screenOptions={{ animation: 'none', headerShown: false, tabBarStyle: { display: 'none' } }}>
+    <Tabs screenOptions={{ animation: 'none', headerShown: false, sceneStyle: { backgroundColor: theme.colors.background }, tabBarStyle: { display: 'none' } }}>
       <Tabs.Screen name="home" />
       <Tabs.Screen name="settings" />
     </Tabs>
