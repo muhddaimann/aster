@@ -4,18 +4,18 @@ import { useTheme } from '../../hooks/useTheme';
 
 type HomeQuickActionsProps = {
   onChat: () => void;
-  onCreateTicket: () => void;
+  onManageTickets: () => void;
 };
 
-export function HomeQuickActions({ onChat, onCreateTicket }: HomeQuickActionsProps) {
+export function HomeQuickActions({ onChat, onManageTickets }: HomeQuickActionsProps) {
   const { theme } = useTheme();
 
   return (
     <View style={{ gap: theme.spacing.md }}>
-      <Text style={{ color: theme.colors.textMuted, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.eyebrow.fontSize, letterSpacing: theme.typography.eyebrow.letterSpacing }}>HOW CAN WE HELP?</Text>
+      <Text style={{ color: theme.colors.textMuted, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.eyebrow.fontSize, letterSpacing: theme.typography.eyebrow.letterSpacing }}>QUICK ACTIONS</Text>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.md }}>
-        <QuickAction icon="chatbubble-ellipses-outline" label="Chat with us" onPress={onChat} theme={theme} />
-        <QuickAction icon="create-outline" label="Send us a ticket" onPress={onCreateTicket} theme={theme} />
+        <QuickAction icon="chatbubble-ellipses-outline" label="Continue chat" onPress={onChat} theme={theme} />
+        <QuickAction icon="ticket-outline" label="Manage ticket" onPress={onManageTickets} theme={theme} />
       </View>
     </View>
   );

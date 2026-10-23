@@ -523,3 +523,11 @@ Do not make changes.
 - Home: the account overview replaces the support hero/profile card. `AppScreen` displays a personalized greeting and the customer phone number as its subtitle, followed by the demo due summary, ticket/chat quick actions, service notices, and ticket status/recent activity. Common-topic quick starts are omitted from the redesigned Home.
 - Dependencies/configuration: no Profile/Home feature dependencies or Expo configuration changes were added. App version is `0.7.0`, sourced from `src/constants/about.ts` and synchronized with `package.json`, `package-lock.json`, and Expo config.
 - Validation: `npx tsc --noEmit`, public Expo config inspection, iOS/Android Expo exports, and `git diff --check`; manually verify nickname edit/fallback/reset, dummy billing labels and no-due state, Home navigation, light/dark mode, large text, and iOS/Android safe-area layout.
+
+### Feature — Home Dashboard Presentation Refinement
+
+- Home content: keep the personalized greeting/phone subtitle, account billing card, and chat/ticket quick actions. The service notice, support summary, and recent activity sections are removed from the Home layout; their underlying notification/ticket features remain available elsewhere.
+- Billing presentation: `AccountBillingCard` uses a theme-aware navy/cyan `expo-linear-gradient` surface, highlights total due and payment due date, and uses a concise `DEMO` badge instead of a long sample-data paragraph. Billing remains fixed dummy data; no payment action or real billing integration is provided.
+- Promotion: the existing `assets/ads/image.png` is displayed as an accessible, non-interactive 110-point-high banner labeled Featured Promotion. No campaign copy, click destination, ad network, or tracking is implied.
+- Dependencies/configuration: `expo-linear-gradient` was installed with Expo tooling (`~58.0.3`); no Expo config plugin or other configuration change was needed.
+- Validation: `npx tsc --noEmit`, iOS/Android Expo exports, and `git diff --check`; manually verify compact banner cropping, gradient contrast in light/dark themes, card amount/date/no-due state, and Home scroll layout on iOS and Android.
