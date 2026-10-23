@@ -19,8 +19,8 @@ export function NotificationHeaderActions({ onOpenActions, onOpenNotifications }
         <Ionicons color={theme.colors.primary} name="notifications-outline" size={22} />
         {unreadCount ? <View pointerEvents="none" style={{ alignItems: 'center', backgroundColor: theme.colors.danger, borderColor: theme.colors.surface, borderRadius: theme.radius.pill, borderWidth: 2, justifyContent: 'center', minWidth: 18, paddingHorizontal: 3, position: 'absolute', right: -3, top: -3 }}><Text style={{ color: theme.colors.onDanger, fontFamily: theme.fontFamily.semibold, fontSize: 10, lineHeight: 14 }}>{unreadLabel}</Text></View> : null}
       </Pressable>
-      <Pressable accessibilityHint="Opens Home shortcuts" accessibilityLabel="Open Home shortcuts" accessibilityRole="button" onPress={onOpenActions} style={({ pressed }) => ({ alignItems: 'center', backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderRadius: theme.radius.pill, borderWidth: 1, height: 48, justifyContent: 'center', opacity: pressed ? theme.opacity.pressed : 1, width: 48 })}>
-        <Ionicons color={theme.colors.primary} name="grid-outline" size={22} />
+      <Pressable accessibilityHint="Opens Home shortcuts" accessibilityLabel="Open Home shortcuts" accessibilityRole="button" onPress={onOpenActions} style={({ pressed }) => ({ alignItems: 'center', backgroundColor: theme.colors.primary, borderRadius: theme.radius.pill, height: 48, justifyContent: 'center', opacity: pressed ? theme.opacity.pressed : 1, width: 48 })}>
+        <Ionicons color={theme.colors.onPrimary} name="grid-outline" size={22} />
       </Pressable>
     </View>
   );

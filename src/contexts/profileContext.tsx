@@ -44,6 +44,7 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
       email: draft.email.trim(),
       fullName: draft.fullName.trim(),
       language: draft.language,
+      nickname: draft.nickname.trim(),
       preferredContactChannel: draft.preferredContactChannel,
     }));
     return { errors: {}, success: true };

@@ -18,10 +18,11 @@ export type CustomerProfile = {
   fullName: string;
   language: SupportLanguage;
   mobileNumberDisplay: string;
+  nickname: string;
   preferredContactChannel: PreferredContactChannel;
 };
 
-export type EditableCustomerProfile = Pick<CustomerProfile, 'email' | 'fullName' | 'language' | 'preferredContactChannel'>;
+export type EditableCustomerProfile = Pick<CustomerProfile, 'email' | 'fullName' | 'language' | 'nickname' | 'preferredContactChannel'>;
 
 export type ProfileValidationErrors = Partial<Record<keyof EditableCustomerProfile, string>>;
 
@@ -31,6 +32,7 @@ export const initialCustomerProfile: CustomerProfile = {
   fullName: 'CelcomDigi Demo Customer',
   language: supportLanguages.english,
   mobileNumberDisplay: '011-0000-0000',
+  nickname: 'Alex',
   preferredContactChannel: preferredContactChannels.phone,
 };
 
@@ -53,6 +55,10 @@ export function validateProfileDraft(draft: EditableCustomerProfile): ProfileVal
 
   if (!fullName) {
     errors.fullName = 'Enter your full name.';
+  }
+
+  if (draft.nickname.trim().length > 30) {
+    errors.nickname = 'Use 30 characters or fewer for your nickname.';
   }
 
   if (!email) {

@@ -505,3 +505,21 @@ Do not make changes.
 - Ticket quick starts: Home topic tiles pass a validated optional ticket-category route parameter to preselect the existing local ticket form category. Missing or invalid parameters leave the form unselected; no category choice is persisted separately.
 - Version: the approved application version is `0.6.0`; `src/constants/about.ts` remains the user-visible metadata source and stays synchronized with package and Expo configuration versions.
 - Validation: `npx tsc --noEmit`, public Expo config inspection, iOS/Android Expo exports, and `git diff --check`; manually verify notification behavior, Settings/About presentation, Home dashboard actions, category preselection, local-data disclosures, light/dark mode, large text, and iOS/Android safe-area placement.
+
+### Feature — Chat Module
+
+- Scope/privacy: Chat is a local, non-production demo. Conversations and free-text messages remain in React memory only and are cleared on logout or app restart. They are not recorded, persisted, or sent to a live support service. The UI clearly discloses this and warns against entering sensitive data; production recording/retention terms must be established before a live chat is offered.
+- Flow: Home asks users to acknowledge the demo disclosure via the typed confirmation overlay when creating the first chat or a new chat. The chat simulates delayed greeting, category prompt, typing indicators, and generic automated replies; it does not imply a live agent is connected. Messages are limited to 500 characters.
+- Records/resume: `ChatProvider` owns multiple session-only conversations. Home resumes the latest chat when one exists. `/home/chat/record` lists conversations and allows resuming one or explicitly creating another; `/home/chat` displays the active conversation. Timed demo replies remain owned by the provider while navigating and are cleared on logout or provider teardown.
+- UI: Chat uses the shared `AppScreen`, themed message bubbles, category choices, a keyboard-aware bottom composer with safe-area padding, automatic scroll-to-latest-message behavior, and no floating scroll controls that could overlap the composer.
+- Home actions: the Home actions picker contains Send us a ticket, Chat with us, Manage profile, and Log out, with short descriptions. Chat resumes or confirms a new demo conversation; other actions retain their existing routes and logout confirmation behavior.
+- Dependencies/configuration: no Chat Module dependencies or Expo configuration were added.
+- Validation: TypeScript, iOS/Android Expo exports, and `git diff --check`; manually verify consent/cancel, staged chat messages, category selection, composer/keyboard behavior, record resume/new-chat behavior, logout clearing, and light/dark and safe-area presentation on iOS and Android.
+
+### Feature — Profile Details and Home Account Overview
+
+- Profile: an optional nickname is editable with the other local demo profile fields. Home uses the nickname for its greeting, falling back to the first name from the full name. Profile data remains in memory for the authenticated session and resets on logout or app restart.
+- Billing summary: `src/constants/billing.ts` owns fixed dummy MYR billing data (RM 128.50, October 2026 statement, due 15 November 2026). It is read-only, visibly labeled as sample data, and displayed on Home and Profile. No real billing lookup, payment action, transaction, or backend is implemented.
+- Home: the account overview replaces the support hero/profile card. `AppScreen` displays a personalized greeting and the customer phone number as its subtitle, followed by the demo due summary, ticket/chat quick actions, service notices, and ticket status/recent activity. Common-topic quick starts are omitted from the redesigned Home.
+- Dependencies/configuration: no Profile/Home feature dependencies or Expo configuration changes were added. App version is `0.7.0`, sourced from `src/constants/about.ts` and synchronized with `package.json`, `package-lock.json`, and Expo config.
+- Validation: `npx tsc --noEmit`, public Expo config inspection, iOS/Android Expo exports, and `git diff --check`; manually verify nickname edit/fallback/reset, dummy billing labels and no-due state, Home navigation, light/dark mode, large text, and iOS/Android safe-area layout.

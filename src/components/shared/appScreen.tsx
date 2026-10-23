@@ -9,6 +9,8 @@ import { useTheme } from '../../hooks/useTheme';
 import { FloatingControls } from '../tabs/bottomBar';
 
 type AppScreenProps = {
+  autoScrollToEndOnContentChange?: boolean;
+  bottomSlot?: ReactNode;
   children: ReactNode;
   onBack?: () => void;
   onRefresh?: () => void;
@@ -17,15 +19,17 @@ type AppScreenProps = {
   rightSlotReservedWidth?: number;
   routeKind: BarRouteKind;
   scrollEnabled?: boolean;
+  showFloatingControls?: boolean;
   subtitle?: string;
   title?: string;
 };
 
 type ScrollControllerRef = {
   scrollTo: (options: { animated?: boolean; x?: number; y?: number }) => void;
+  scrollToEnd: (options?: { animated?: boolean }) => void;
 };
 
-export function AppScreen({ children, onBack, onRefresh, refreshing = false, rightSlot, rightSlotReservedWidth = 48, routeKind, scrollEnabled = true, subtitle, title }: AppScreenProps) {
+export function AppScreen({ autoScrollToEndOnContentChange = false, bottomSlot, children, onBack, onRefresh, refreshing = false, rightSlot, rightSlotReservedWidth = 48, routeKind, scrollEnabled = true, showFloatingControls = true, subtitle, title }: AppScreenProps) {
   const { theme } = useTheme();
   const { registerScreen, reportScroll } = useBar();
   const scrollViewRef = useRef<ScrollControllerRef | null>(null);
@@ -47,6 +51,7 @@ export function AppScreen({ children, onBack, onRefresh, refreshing = false, rig
         <ScrollView
           contentContainerStyle={{ gap: theme.spacing.xl, padding: theme.spacing.xl, paddingBottom: routeKind === 'root' ? layout.rootScreenBottomClearance : theme.spacing.xxl }}
           onScroll={(event) => reportScroll(screenIdRef.current, event.nativeEvent.contentOffset.y)}
+          onContentSizeChange={() => { if (autoScrollToEndOnContentChange) scrollViewRef.current?.scrollToEnd({ animated: true }); }}
           refreshControl={onRefresh ? <RefreshControl colors={[theme.colors.accent]} onRefresh={onRefresh} refreshing={refreshing} tintColor={theme.colors.accent} /> : undefined}
           ref={scrollViewRef as never}
           scrollEventThrottle={16}
@@ -64,13 +69,14 @@ export function AppScreen({ children, onBack, onRefresh, refreshing = false, rig
           </ScreenContent>
         </View>
       )}
+      {bottomSlot}
       {onBack || rightSlot ? (
         <View pointerEvents="box-none" style={{ left: 0, position: 'absolute', right: 0, top: theme.spacing.xl }}>
           {onBack ? <View style={{ left: theme.spacing.xl, position: 'absolute', top: 0 }}><BackControl onPress={onBack} theme={theme} /></View> : null}
           {rightSlot ? <View style={{ position: 'absolute', right: theme.spacing.xl, top: 0 }}>{rightSlot}</View> : null}
         </View>
       ) : null}
-      {routeKind === 'nested' ? <FloatingControls /> : null}
+      {routeKind === 'nested' && showFloatingControls ? <FloatingControls /> : null}
     </Animated.View>
   );
 }

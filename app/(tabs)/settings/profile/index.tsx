@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { Pressable, Text, TextInput, View } from 'react-native';
 import { ProfileDetail } from '../../../../src/components/profile/profileDetail';
+import { AccountBillingCard } from '../../../../src/components/profile/accountBillingCard';
 import { AppScreen } from '../../../../src/components/shared/appScreen';
 import { preferredContactChannels, profileLabels, supportLanguages, type EditableCustomerProfile, type ProfileValidationErrors } from '../../../../src/constants/profile';
 import { useOverlay } from '../../../../src/hooks/useOverlay';
@@ -15,17 +16,17 @@ export default function ProfileScreen() {
   const overlay = useOverlay();
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
-  const [draft, setDraft] = useState<EditableCustomerProfile>({ email: profile.email, fullName: profile.fullName, language: profile.language, preferredContactChannel: profile.preferredContactChannel });
+  const [draft, setDraft] = useState<EditableCustomerProfile>({ email: profile.email, fullName: profile.fullName, language: profile.language, nickname: profile.nickname, preferredContactChannel: profile.preferredContactChannel });
   const [errors, setErrors] = useState<ProfileValidationErrors>({});
 
   const beginEditing = () => {
-    setDraft({ email: profile.email, fullName: profile.fullName, language: profile.language, preferredContactChannel: profile.preferredContactChannel });
+    setDraft({ email: profile.email, fullName: profile.fullName, language: profile.language, nickname: profile.nickname, preferredContactChannel: profile.preferredContactChannel });
     setErrors({});
     setIsEditing(true);
   };
 
   const cancelEditing = () => {
-    setDraft({ email: profile.email, fullName: profile.fullName, language: profile.language, preferredContactChannel: profile.preferredContactChannel });
+    setDraft({ email: profile.email, fullName: profile.fullName, language: profile.language, nickname: profile.nickname, preferredContactChannel: profile.preferredContactChannel });
     setErrors({});
     setIsEditing(false);
   };
@@ -58,7 +59,10 @@ export default function ProfileScreen() {
             <View style={{ alignItems: 'center', backgroundColor: theme.colors.infoSoft, borderRadius: theme.radius.pill, height: 72, justifyContent: 'center', width: 72 }}><Ionicons color={theme.colors.primary} name="person-outline" size={36} /></View>
             <View style={{ alignItems: 'center', gap: theme.spacing.xs }}><Text style={{ color: theme.colors.textPrimary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.body.fontSize }}>{profile.fullName}</Text><Text style={{ color: theme.colors.textSecondary, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.label.fontSize }}>{profileLabels.accountType}</Text></View>
           </View>
+          <AccountBillingCard />
           <View style={cardStyle}>
+            <ProfileDetail icon="person-outline" label="Nickname" value={profile.nickname || 'Not set'} />
+            <ProfileDetail icon="person-circle-outline" label="Full name" value={profile.fullName} />
             <ProfileDetail icon="call-outline" label="Mobile number" value={profile.mobileNumberDisplay} />
             <ProfileDetail icon="mail-outline" label="Email" value={profile.email} />
             <ProfileDetail icon="language-outline" label="Language" value={profileLabels.language[profile.language]} />
@@ -68,6 +72,7 @@ export default function ProfileScreen() {
         </>
       ) : (
         <View style={cardStyle}>
+          <ProfileTextField error={errors.nickname} label="Nickname (optional)" maxLength={30} onChangeText={(nickname) => setDraft((currentDraft) => ({ ...currentDraft, nickname }))} theme={theme} value={draft.nickname} />
           <ProfileTextField error={errors.fullName} label="Full name" onChangeText={(fullName) => setDraft((currentDraft) => ({ ...currentDraft, fullName }))} theme={theme} value={draft.fullName} />
           <ProfileTextField autoComplete="email" error={errors.email} keyboardType="email-address" label="Email" onChangeText={(email) => setDraft((currentDraft) => ({ ...currentDraft, email }))} theme={theme} value={draft.email} />
           <View style={{ gap: theme.spacing.sm }}><Text style={fieldLabelStyle}>Language</Text><PreferenceButtons onSelect={(language) => setDraft((currentDraft) => ({ ...currentDraft, language }))} options={[{ label: profileLabels.language[supportLanguages.english], value: supportLanguages.english }, { label: profileLabels.language[supportLanguages.bahasaMalaysia], value: supportLanguages.bahasaMalaysia }]} selectedValue={draft.language} theme={theme} /></View>
@@ -79,8 +84,8 @@ export default function ProfileScreen() {
   );
 }
 
-function ProfileTextField({ autoComplete, error, keyboardType, label, onChangeText, theme, value }: { autoComplete?: 'email'; error?: string; keyboardType?: 'default' | 'email-address'; label: string; onChangeText: (value: string) => void; theme: ReturnType<typeof useTheme>['theme']; value: string }) {
-  return <View style={{ gap: theme.spacing.sm }}><Text style={{ color: theme.colors.textSecondary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.label.fontSize }}>{label}</Text><TextInput accessibilityLabel={label} autoCapitalize={label === 'Email' ? 'none' : 'words'} autoComplete={autoComplete} keyboardType={keyboardType} onChangeText={onChangeText} placeholderTextColor={theme.colors.textMuted} style={{ backgroundColor: theme.colors.background, borderColor: error ? theme.colors.danger : theme.colors.border, borderRadius: theme.radius.md, borderWidth: 1, color: theme.colors.textPrimary, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.body.fontSize, minHeight: 48, paddingHorizontal: theme.spacing.md }} value={value} />{error ? <Text style={{ color: theme.colors.danger, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.label.fontSize }}>{error}</Text> : null}</View>;
+function ProfileTextField({ autoComplete, error, keyboardType, label, maxLength, onChangeText, theme, value }: { autoComplete?: 'email'; error?: string; keyboardType?: 'default' | 'email-address'; label: string; maxLength?: number; onChangeText: (value: string) => void; theme: ReturnType<typeof useTheme>['theme']; value: string }) {
+  return <View style={{ gap: theme.spacing.sm }}><Text style={{ color: theme.colors.textSecondary, fontFamily: theme.fontFamily.semibold, fontSize: theme.typography.label.fontSize }}>{label}</Text><TextInput accessibilityLabel={label} autoCapitalize={label === 'Email' ? 'none' : 'words'} autoComplete={autoComplete} keyboardType={keyboardType} maxLength={maxLength} onChangeText={onChangeText} placeholderTextColor={theme.colors.textMuted} style={{ backgroundColor: theme.colors.background, borderColor: error ? theme.colors.danger : theme.colors.border, borderRadius: theme.radius.md, borderWidth: 1, color: theme.colors.textPrimary, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.body.fontSize, minHeight: 48, paddingHorizontal: theme.spacing.md }} value={value} />{error ? <Text style={{ color: theme.colors.danger, fontFamily: theme.fontFamily.regular, fontSize: theme.typography.label.fontSize }}>{error}</Text> : null}</View>;
 }
 
 function PreferenceButtons<T extends string>({ onSelect, options, selectedValue, theme }: { onSelect: (value: T) => void; options: { label: string; value: T }[]; selectedValue: T; theme: ReturnType<typeof useTheme>['theme'] }) {

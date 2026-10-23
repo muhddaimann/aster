@@ -9,6 +9,7 @@ import { AuthProvider } from '../src/contexts/authContext';
 import { ProfileProvider } from '../src/contexts/profileContext';
 import { TicketProvider } from '../src/contexts/ticketContext';
 import { NotificationProvider } from '../src/contexts/notificationContext';
+import { ChatProvider } from '../src/contexts/chatContext';
 import { ThemeProvider } from '../src/contexts/themeContext';
 import { useOverlay } from '../src/hooks/useOverlay';
 import { useTheme } from '../src/hooks/useTheme';
@@ -34,11 +35,13 @@ export default function RootLayout() {
           <AuthProvider>
             <ProfileProvider>
               <TicketProvider>
-                <NotificationProvider>
-                  <BarProvider>
-                    <RootShell />
-                  </BarProvider>
-                </NotificationProvider>
+                <ChatProvider>
+                  <NotificationProvider>
+                    <BarProvider>
+                      <RootShell />
+                    </BarProvider>
+                  </NotificationProvider>
+                </ChatProvider>
               </TicketProvider>
             </ProfileProvider>
           </AuthProvider>

@@ -1,18 +1,20 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
-import { HomeSupportHero } from '../../../src/components/home/homeSupportHero';
+import { AccountBillingCard } from '../../../src/components/profile/accountBillingCard';
+import { HomeQuickActions } from '../../../src/components/home/homeQuickActions';
 import { ServiceNoticeCard } from '../../../src/components/home/serviceNoticeCard';
 import { SupportSummary } from '../../../src/components/home/supportSummary';
-import { SupportTopicGrid } from '../../../src/components/home/supportTopicGrid';
 import { NotificationHeaderActions } from '../../../src/components/notification/notificationHeaderActions';
 import { AppScreen } from '../../../src/components/shared/appScreen';
 import { OptionPicker } from '../../../src/components/shared/optionPicker';
 import { TicketCard } from '../../../src/components/ticket/ticketCard';
 import { BottomBar } from '../../../src/components/tabs/bottomBar';
 import { notificationKinds } from '../../../src/constants/notification';
+import { chatCopy } from '../../../src/constants/chat';
 import { ticketStatuses, type TicketCategory } from '../../../src/constants/ticket';
 import { useAuth } from '../../../src/hooks/useAuth';
+import { useChat } from '../../../src/hooks/useChat';
 import { useNotification } from '../../../src/hooks/useNotification';
 import { useOverlay } from '../../../src/hooks/useOverlay';
 import { useProfile } from '../../../src/hooks/useProfile';
@@ -20,9 +22,9 @@ import { useTheme } from '../../../src/hooks/useTheme';
 import { useTicket } from '../../../src/hooks/useTicket';
 
 export default function HomeScreen() {
-  const { theme } = useTheme();
   const overlay = useOverlay();
   const { logout } = useAuth();
+  const { conversations, createChat, resumeChat } = useChat();
   const { notifications } = useNotification();
   const { profile } = useProfile();
   const router = useRouter();
@@ -31,9 +33,30 @@ export default function HomeScreen() {
   const resolvedTicketCount = tickets.filter((ticket) => ticket.status === ticketStatuses.resolved).length;
   const latestTicket = tickets[0] ?? null;
   const serviceNotice = notifications.find((notification) => notification.kind === notificationKinds.serviceNotice && !notification.acknowledgedAt) ?? null;
+  const greetingName = profile.nickname.trim() || profile.fullName.trim().split(/\s+/)[0] || 'there';
 
   const openCreateTicket = (category?: TicketCategory) => {
     router.push(category ? `/home/ticket?category=${category}` : '/home/ticket');
+  };
+
+  const openDemoChat = () => {
+    const latestConversation = conversations[0];
+    if (latestConversation) {
+      resumeChat(latestConversation.id);
+      router.push('/home/chat');
+      return;
+    }
+
+    overlay.confirm({
+      cancelLabel: 'Not now',
+      confirmLabel: 'Continue',
+      message: chatCopy.consentDisclosure,
+      onConfirm: () => {
+        createChat();
+        router.push('/home/chat');
+      },
+      title: chatCopy.consentTitle,
+    });
   };
 
   const confirmLogout = () => {
@@ -58,12 +81,12 @@ export default function HomeScreen() {
         <OptionPicker
           mode="action"
           onSelect={(value) => overlay.dismiss(() => {
-            if (value === 'createTicket') {
+            if (value === 'sendTicket') {
               router.replace('/home/ticket');
               return;
             }
-            if (value === 'ticketRecords') {
-              router.replace('/home/ticket/record');
+            if (value === 'chat') {
+              openDemoChat();
               return;
             }
             if (value === 'profile') {
@@ -74,22 +97,22 @@ export default function HomeScreen() {
           })}
           options={[
             {
-              description: 'Tell us about a local demo CelcomDigi support need.',
-              label: 'Create ticket',
-              value: 'createTicket',
+              description: 'Create a local support request.',
+              label: 'Send us a ticket',
+              value: 'sendTicket',
             },
             {
-              description: 'View support tickets created in this local app session.',
-              label: 'Ticket records',
-              value: 'ticketRecords',
+              description: 'Continue or start a demo chat.',
+              label: 'Chat with us',
+              value: 'chat',
             },
             {
-              description: 'View and edit local demo customer details.',
-              label: 'Profile',
+              description: 'View or update your details.',
+              label: 'Manage profile',
               value: 'profile',
             },
             {
-              description: 'Remove the local demo session from this device.',
+              description: 'End your demo session.',
               label: 'Log out',
               value: 'logout',
             },
@@ -111,14 +134,14 @@ export default function HomeScreen() {
         )}
         rightSlotReservedWidth={112}
         routeKind="root"
-        subtitle="ASTER SUPPORT"
-        title="Home"
+        subtitle={profile.mobileNumberDisplay}
+        title={`Good day, ${greetingName}`}
       >
-        <HomeSupportHero onCreateTicket={() => openCreateTicket()} profile={profile} />
+        <AccountBillingCard featured />
+        <HomeQuickActions onChat={openDemoChat} onCreateTicket={() => openCreateTicket()} />
+        {serviceNotice ? <ServiceNoticeCard notice={serviceNotice} onPress={() => router.push('/home/notification')} /> : null}
         <SupportSummary onOpenRecords={() => router.push('/home/ticket/record')} openCount={openTicketCount} resolvedCount={resolvedTicketCount} />
         <RecentTicketSection onCreateTicket={() => openCreateTicket()} onOpenRecords={() => router.push('/home/ticket/record')} onOpenTicket={() => latestTicket && router.push(`/home/ticket/${latestTicket.id}`)} ticket={latestTicket} />
-        <SupportTopicGrid onSelect={openCreateTicket} />
-        {serviceNotice ? <ServiceNoticeCard notice={serviceNotice} onPress={() => router.push('/home/notification')} /> : null}
       </AppScreen>
       <BottomBar
         activeTab="home"

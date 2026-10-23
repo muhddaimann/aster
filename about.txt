@@ -131,3 +131,27 @@ HomeScreen need total redesign too
 profile widget no need to route to ProfileScreen since rightSlot have
 advice what to include to the front page of Customer Support and Ticketing platform for CelcomDigi Telco customers
 advice
+
+
+Chat Modulei
+based on app about, design direction
+module where user routed to page to chat, ask to agree you ths chat will be recorded, on yes submit Hi from user, system sya how can i help and option if help category
+constant to keep types, dummy data etc
+contexts to keep flow, read, update etc
+hooks to use it globally
+components/chat/ for any widget on page later
+app/
+├─ (tabs)/
+│  ├─ home/
+│  │  ├─ chat/
+│  │  │  └─ index.tsx
+src/
+├── components/
+│   └── chat/
+├── constants/
+│   └── chat.ts
+├── contexts/
+│   └── chatContext.ts
+└── hooks/
+    └── useChat.ts
+advice
